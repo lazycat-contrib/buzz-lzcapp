@@ -130,14 +130,16 @@ services:
       - 'BUZZ_S3_ACCESS_KEY={{ stable_secret "buzz_minio_access_key" }}'
       - 'BUZZ_S3_SECRET_KEY={{ stable_secret "buzz_minio_secret_key" }}'
       - BUZZ_S3_BUCKET=buzz-media
+    # Keep $$ escaped here so Compose/LazyCat defers expansion to the container shell.
     entrypoint: >-
-      /bin/sh -euc 'until mc alias set local http://minio:9000 "$BUZZ_S3_ACCESS_KEY" "$BUZZ_S3_SECRET_KEY"; do sleep 2; done; mc mb --ignore-existing "local/$BUZZ_S3_BUCKET"; mc anonymous set none "local/$BUZZ_S3_BUCKET"'
+      /bin/sh -euc 'until mc alias set local http://minio:9000 "$$BUZZ_S3_ACCESS_KEY" "$$BUZZ_S3_SECRET_KEY"; do sleep 2; done; mc mb --ignore-existing "local/$$BUZZ_S3_BUCKET"; mc anonymous set none "local/$$BUZZ_S3_BUCKET"'
     mem_limit: 256M
 
 usage: |
   首次部署需要准备两套独立的 Nostr 密钥对，但安装向导只填写两个值：
-  1. Owner 身份密钥对：将 64 位十六进制公钥填入“中继所有者公钥”；对应私钥只保存在所有者的 Nostr 客户端或密码管理器中，绝不能填入本应用。已有 Nostr 身份可以直接复用。
-  2. Relay 签名密钥对：将另一套密钥对的 64 位十六进制私钥填入“中继私钥”并安全备份；其公钥由 Buzz 自动推导，无需填写。不要与 Owner 私钥共用。
+  1. Owner 身份密钥对：将 64 位十六进制公钥填入“中继所有者公钥”；对应私钥只保存在所有者的 Nostr 客户端或密码管理器中，绝不能填入本应用。已有 Nostr 身份可以直接复用。这里要的是原始 hex，不是 Base64，也不是 npub1... 编码。
+  2. Relay 签名密钥对：将另一套密钥对的 64 位十六进制私钥填入“中继私钥”并安全备份；其公钥由 Buzz 自动推导，无需填写。不要与 Owner 私钥共用。这里同样要原始 hex，不是 Base64，也不是 nsec1... 编码。
+  如果手里只有 npub/nsec，请在本地执行 `nak decode '<npub 或 nsec>'` 转换为 64 位 hex。不要将 nsec 或私钥发给他人。
   可在 Buzz 源码目录运行两次 `cargo run -p buzz-admin -- generate-key` 生成上述两套密钥。向导需要原始十六进制值，不是 npub 或 nsec 编码。
   Arch Linux/AUR 用户也可以使用 `nak-bin`：
     paru -S nak-bin  # 也可以使用 yay -S nak-bin

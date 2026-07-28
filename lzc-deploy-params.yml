@@ -2,13 +2,13 @@ params:
   - id: owner_pubkey
     type: string
     name: Relay Owner Public Key
-    description: 64-character hexadecimal Nostr public key of the human or community owner. Keep the matching private key in your Nostr client and never enter it here.
+    description: Raw 64-character hexadecimal Nostr public key of the human or community owner. This is not Base64 or an npub1 value. Keep the matching private key in your Nostr client and never enter it here.
     optional: false
 
   - id: relay_private_key
     type: secret
     name: Relay Private Key
-    description: Independent 64-character hexadecimal Nostr private key used only by this Buzz relay to sign relay and membership events. Do not reuse the owner's private key, and back it up securely.
+    description: Independent raw 64-character hexadecimal Nostr private key used only by this Buzz relay to sign relay and membership events. This is not Base64 or an nsec1 value. Do not reuse the owner's private key, and back it up securely.
     optional: false
 
   - id: require_auth_token
@@ -71,10 +71,10 @@ locales:
   zh:
     owner_pubkey:
       name: 中继所有者公钥
-      description: 人类或社区所有者的 64 位十六进制 Nostr 公钥。对应的个人私钥应保存在 Nostr 客户端中，绝不能填写到这里。
+      description: 人类或社区所有者的原始 64 位十六进制 Nostr 公钥，不是 Base64，也不是 npub1 值。对应的个人私钥应保存在 Nostr 客户端中，绝不能填写到这里。
     relay_private_key:
       name: 中继私钥
-      description: 仅供此 Buzz 中继签署中继和成员事件的独立 64 位十六进制 Nostr 私钥。不要复用所有者私钥，并请安全备份。
+      description: 仅供此 Buzz 中继签署中继和成员事件的独立原始 64 位十六进制 Nostr 私钥，不是 Base64，也不是 nsec1 值。不要复用所有者私钥，并请安全备份。
     require_auth_token:
       name: 要求认证令牌
       description: 对受保护的中继操作强制要求认证令牌。

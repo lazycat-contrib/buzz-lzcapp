@@ -8,8 +8,8 @@ The package runs the Buzz relay with PostgreSQL, Redis, and MinIO. The launcher 
 
 Prepare these two values before installation:
 
-- `RELAY_OWNER_PUBKEY`: the 64-character hexadecimal public key of the human or community owner. Keep the matching private key in the owner's Nostr client; never enter that private key in the LazyCat setup wizard.
-- `BUZZ_RELAY_PRIVATE_KEY`: a separate, stable 64-character hexadecimal private key used only by the Buzz relay to sign relay and membership events. Do not reuse the owner's private key, and back it up securely.
+- `RELAY_OWNER_PUBKEY`: the raw 64-character hexadecimal public key of the human or community owner, not Base64 or an `npub1...` value. Keep the matching private key in the owner's Nostr client; never enter that private key in the LazyCat setup wizard.
+- `BUZZ_RELAY_PRIVATE_KEY`: a separate, stable raw 64-character hexadecimal private key used only by the Buzz relay to sign relay and membership events, not Base64 or an `nsec1...` value. Do not reuse the owner's private key, and back it up securely.
 
 `BUZZ_GIT_HOOK_HMAC_SECRET` is generated automatically as an app-scoped stable secret. The database, Redis, and MinIO credentials are managed the same way and do not require user input.
 
@@ -53,6 +53,8 @@ unset OWNER_PRIVATE_KEY RELAY_OWNER_PUBKEY BUZZ_RELAY_PRIVATE_KEY
 ```
 
 The setup wizard requires raw 64-character hexadecimal values, not `npub` or `nsec` encodings.
+
+If a client only shows an `npub1...` or `nsec1...` value, convert it locally with `nak decode '<npub or nsec>'`. Never paste an `nsec` or private key into chat, an issue, or deployment logs.
 
 ## Build
 
