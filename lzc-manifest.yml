@@ -139,6 +139,13 @@ usage: |
   1. Owner 身份密钥对：将 64 位十六进制公钥填入“中继所有者公钥”；对应私钥只保存在所有者的 Nostr 客户端或密码管理器中，绝不能填入本应用。已有 Nostr 身份可以直接复用。
   2. Relay 签名密钥对：将另一套密钥对的 64 位十六进制私钥填入“中继私钥”并安全备份；其公钥由 Buzz 自动推导，无需填写。不要与 Owner 私钥共用。
   可在 Buzz 源码目录运行两次 `cargo run -p buzz-admin -- generate-key` 生成上述两套密钥。向导需要原始十六进制值，不是 npub 或 nsec 编码。
+  Arch Linux/AUR 用户也可以使用 `nak-bin`：
+    paru -S nak-bin  # 也可以使用 yay -S nak-bin
+    OWNER_PRIVATE_KEY="$(nak key generate)"
+    RELAY_OWNER_PUBKEY="$(nak key public "$OWNER_PRIVATE_KEY")"
+    BUZZ_RELAY_PRIVATE_KEY="$(nak key generate)"
+    printf 'RELAY_OWNER_PUBKEY=%s\nBUZZ_RELAY_PRIVATE_KEY=%s\n' "$RELAY_OWNER_PUBKEY" "$BUZZ_RELAY_PRIVATE_KEY"
+  请立即保存 `OWNER_PRIVATE_KEY` 和 `BUZZ_RELAY_PRIVATE_KEY`，填写向导后执行 `unset OWNER_PRIVATE_KEY RELAY_OWNER_PUBKEY BUZZ_RELAY_PRIVATE_KEY` 清除临时变量。
   每个加入 Buzz 的人类或 Agent 还需要自己的 Nostr 身份密钥对，但这是安装后的成员配置，不属于部署向导。
   Git Hook HMAC、PostgreSQL、Redis 和 MinIO 密钥均由应用自动生成并稳定保存，无需用户填写。
   启动器入口提供邀请页面和 Git 仓库浏览器，桌面或移动端 Buzz 客户端可通过当前应用域名连接此中继。
