@@ -50,4 +50,4 @@ stores:
       source_author: block
   private:
     enabled: true
-    skip_if_version_exists: false
+    skip_if_version_exists: true
