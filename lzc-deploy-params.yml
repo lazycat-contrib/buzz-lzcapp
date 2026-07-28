@@ -1,0 +1,110 @@
+params:
+  - id: owner_pubkey
+    type: string
+    name: Relay Owner Public Key
+    description: 64-character hexadecimal Nostr public key for the relay owner.
+    optional: false
+
+  - id: relay_private_key
+    type: secret
+    name: Relay Private Key
+    description: Stable 64-character hexadecimal Nostr private key used by the relay. Back it up securely.
+    optional: false
+
+  - id: git_hook_hmac_secret
+    type: secret
+    name: Git Hook HMAC Secret
+    description: Stable random secret of at least 32 characters used to authenticate Git hooks.
+    optional: false
+
+  - id: require_auth_token
+    type: bool
+    name: Require Auth Token
+    description: Require an authentication token for protected relay operations.
+    default_value: "true"
+    optional: true
+
+  - id: require_relay_membership
+    type: bool
+    name: Require Relay Membership
+    description: Restrict relay access to approved members.
+    default_value: "true"
+    optional: true
+
+  - id: allow_nip_oa_auth
+    type: bool
+    name: Allow NIP-OA Authentication
+    description: Allow NIP-OA authentication for compatible Nostr clients.
+    default_value: "true"
+    optional: true
+
+  - id: require_media_get_auth
+    type: bool
+    name: Require Media Read Authentication
+    description: Require authenticated relay membership when reading stored media.
+    default_value: "true"
+    optional: true
+
+  - id: serve_git_web_gui
+    type: bool
+    name: Enable Git Web Interface
+    description: Serve the built-in repository browser and invite pages from the relay.
+    default_value: "true"
+    optional: true
+
+  - id: auto_migrate
+    type: bool
+    name: Run Database Migrations
+    description: Automatically apply database migrations when Buzz starts.
+    default_value: "true"
+    optional: true
+
+  - id: git_conformance_probe
+    type: bool
+    name: Enable Git Conformance Probe
+    description: Run Buzz Git backend conformance checks during startup.
+    default_value: "true"
+    optional: true
+
+  - id: rust_log
+    type: string
+    name: Rust Log Filter
+    description: Rust tracing filter used by the Buzz relay.
+    default_value: buzz_relay=info,buzz_db=info,buzz_auth=info,buzz_pubsub=info,tower_http=info
+    optional: true
+
+locales:
+  zh:
+    owner_pubkey:
+      name: 中继所有者公钥
+      description: 中继所有者的 64 位十六进制 Nostr 公钥。
+    relay_private_key:
+      name: 中继私钥
+      description: 中继使用的稳定 64 位十六进制 Nostr 私钥，请安全备份。
+    git_hook_hmac_secret:
+      name: Git Hook HMAC 密钥
+      description: 用于验证 Git Hook 的稳定随机密钥，至少 32 个字符。
+    require_auth_token:
+      name: 要求认证令牌
+      description: 对受保护的中继操作强制要求认证令牌。
+    require_relay_membership:
+      name: 要求中继成员资格
+      description: 仅允许获准成员访问中继。
+    allow_nip_oa_auth:
+      name: 允许 NIP-OA 认证
+      description: 允许兼容的 Nostr 客户端使用 NIP-OA 认证。
+    require_media_get_auth:
+      name: 要求媒体读取认证
+      description: 读取已存储媒体时要求经过认证的中继成员资格。
+    serve_git_web_gui:
+      name: 启用 Git Web 界面
+      description: 从中继提供内置仓库浏览器和邀请页面。
+    auto_migrate:
+      name: 自动执行数据库迁移
+      description: Buzz 启动时自动应用数据库迁移。
+    git_conformance_probe:
+      name: 启用 Git 一致性探测
+      description: 启动时运行 Buzz Git 后端一致性检查。
+    rust_log:
+      name: Rust 日志过滤器
+      description: Buzz 中继使用的 Rust tracing 日志过滤规则。

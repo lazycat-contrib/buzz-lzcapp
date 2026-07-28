@@ -1,0 +1,140 @@
+application:
+  subdomain: buzz
+  background_task: true
+  upstreams:
+    - location: /
+      backend: http://relay:3000/
+      fix_websocket_header: true
+  public_path:
+    - /
+  injects:
+    - id: open-save-chooser
+      on: browser
+      when:
+        - "/*"
+      do:
+        - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
+
+services:
+  relay:
+    # upstream: ghcr.io/block/buzz:main@sha256:481ae6ac54c85f03291eac2de1ff9d45978295a9c61810b26e90e88dfbc095ae
+    image: registry.lazycat.cloud/czyt/block/buzz:bcf555cc157768ee
+    run_as: 1000
+    environment:
+      - BUZZ_BIND_ADDR=0.0.0.0:3000
+      - BUZZ_HEALTH_PORT=8080
+      - BUZZ_METRICS_PORT=9102
+      - 'DATABASE_URL=postgres://buzz:{{ stable_secret "buzz_postgres_password" }}@postgres:5432/buzz'
+      - 'REDIS_URL=redis://:{{ stable_secret "buzz_redis_password" }}@redis:6379'
+      - BUZZ_S3_ENDPOINT=http://minio:9000
+      - 'BUZZ_S3_ACCESS_KEY={{ stable_secret "buzz_minio_access_key" }}'
+      - 'BUZZ_S3_SECRET_KEY={{ stable_secret "buzz_minio_secret_key" }}'
+      - BUZZ_S3_BUCKET=buzz-media
+      - BUZZ_GIT_REPO_PATH=/data/git
+      - 'RELAY_URL=wss://{{.S.AppDomain}}'
+      - 'BUZZ_MEDIA_BASE_URL=https://{{.S.AppDomain}}/media'
+      - 'BUZZ_CORS_ORIGINS=https://{{.S.AppDomain}}'
+      - 'BUZZ_REQUIRE_AUTH_TOKEN={{.U.require_auth_token}}'
+      - 'BUZZ_REQUIRE_RELAY_MEMBERSHIP={{.U.require_relay_membership}}'
+      - 'BUZZ_ALLOW_NIP_OA_AUTH={{.U.allow_nip_oa_auth}}'
+      - 'BUZZ_REQUIRE_MEDIA_GET_AUTH={{.U.require_media_get_auth}}'
+      - 'BUZZ_SERVE_GIT_WEB_GUI={{.U.serve_git_web_gui}}'
+      - 'BUZZ_AUTO_MIGRATE={{.U.auto_migrate}}'
+      - 'BUZZ_GIT_CONFORMANCE_PROBE={{.U.git_conformance_probe}}'
+      - 'RELAY_OWNER_PUBKEY={{.U.owner_pubkey}}'
+      - 'BUZZ_RELAY_PRIVATE_KEY={{.U.relay_private_key}}'
+      - 'BUZZ_GIT_HOOK_HMAC_SECRET={{.U.git_hook_hmac_secret}}'
+      - 'RUST_LOG={{.U.rust_log}}'
+    binds:
+      - /lzcapp/var/git:/data/git
+    depends_on:
+      - postgres
+      - redis
+      - minio
+      - minio-init
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          bash -ec 'exec 3<>/dev/tcp/127.0.0.1/8080; printf "GET /_readiness HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n" >&3; grep -q "200 OK" <&3'
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+    mem_limit: 2G
+
+  postgres:
+    # upstream: postgres:17-alpine
+    image: registry.lazycat.cloud/czyt/library/postgres:ed54717bb8980026
+    environment:
+      - POSTGRES_DB=buzz
+      - POSTGRES_USER=buzz
+      - 'POSTGRES_PASSWORD={{ stable_secret "buzz_postgres_password" }}'
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    binds:
+      - /lzcapp/var/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U buzz -d buzz
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    mem_limit: 1G
+
+  redis:
+    # upstream: redis:7-alpine
+    image: registry.lazycat.cloud/czyt/library/redis:3c920c7722097bfa
+    command: 'redis-server --appendonly yes --requirepass {{ stable_secret "buzz_redis_password" }}'
+    binds:
+      - /lzcapp/var/redis:/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          redis-cli -a '{{ stable_secret "buzz_redis_password" }}' ping | grep -q PONG
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+    mem_limit: 512M
+
+  minio:
+    # upstream: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    image: registry.lazycat.cloud/czyt/minio/minio:9bb231199b35a5fa
+    command: 'server /data --console-address ":9001"'
+    environment:
+      - 'MINIO_ROOT_USER={{ stable_secret "buzz_minio_access_key" }}'
+      - 'MINIO_ROOT_PASSWORD={{ stable_secret "buzz_minio_secret_key" }}'
+    binds:
+      - /lzcapp/var/minio:/data
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - -f
+        - http://127.0.0.1:9000/minio/health/live
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    mem_limit: 1G
+
+  minio-init:
+    # upstream: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    image: registry.lazycat.cloud/czyt/minio/mc:f3ee9765dbdcd95d
+    depends_on:
+      - minio
+    environment:
+      - 'BUZZ_S3_ACCESS_KEY={{ stable_secret "buzz_minio_access_key" }}'
+      - 'BUZZ_S3_SECRET_KEY={{ stable_secret "buzz_minio_secret_key" }}'
+      - BUZZ_S3_BUCKET=buzz-media
+    entrypoint: >-
+      /bin/sh -euc 'until mc alias set local http://minio:9000 "$BUZZ_S3_ACCESS_KEY" "$BUZZ_S3_SECRET_KEY"; do sleep 2; done; mc mb --ignore-existing "local/$BUZZ_S3_BUCKET"; mc anonymous set none "local/$BUZZ_S3_BUCKET"'
+    mem_limit: 256M
+
+usage: |
+  安装时填写中继所有者公钥、稳定中继私钥和 Git Hook HMAC 密钥。
+  Buzz 使用 Nostr 身份密钥而不是传统账号密码；请妥善备份中继私钥。
+  启动器入口提供邀请页面和 Git 仓库浏览器，桌面或移动端 Buzz 客户端可通过当前应用域名连接此中继。

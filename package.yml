@@ -1,0 +1,20 @@
+package: community.lazycat.app.buzz
+version: 0.4.0
+name: Buzz
+description: A workspace where humans and agents build together, on a relay you own.
+min_os_version: 1.6.0
+author: block
+license: Apache-2.0
+homepage: https://github.com/block/buzz
+
+locales:
+  zh:
+    name: Buzz
+    description: 一个由你掌控中继服务、供人类与智能体共同协作的工作空间。
+  en:
+    name: Buzz
+    description: A workspace where humans and agents build together, on a relay you own.
+
+permissions:
+  required:
+    - net.internet
