@@ -49,5 +49,5 @@ stores:
       source: https://github.com/block/buzz
       source_author: block
   private:
-    enabled: false
+    enabled: true
     skip_if_version_exists: false
