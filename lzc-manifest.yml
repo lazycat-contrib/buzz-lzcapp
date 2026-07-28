@@ -43,7 +43,7 @@ services:
       - 'BUZZ_GIT_CONFORMANCE_PROBE={{.U.git_conformance_probe}}'
       - 'RELAY_OWNER_PUBKEY={{.U.owner_pubkey}}'
       - 'BUZZ_RELAY_PRIVATE_KEY={{.U.relay_private_key}}'
-      - 'BUZZ_GIT_HOOK_HMAC_SECRET={{.U.git_hook_hmac_secret}}'
+      - 'BUZZ_GIT_HOOK_HMAC_SECRET={{ stable_secret "buzz_git_hook_hmac_secret_v1" }}'
       - 'RUST_LOG={{.U.rust_log}}'
     binds:
       - /lzcapp/var/git:/data/git
@@ -135,6 +135,6 @@ services:
     mem_limit: 256M
 
 usage: |
-  安装时填写中继所有者公钥、稳定中继私钥和 Git Hook HMAC 密钥。
-  Buzz 使用 Nostr 身份密钥而不是传统账号密码；请妥善备份中继私钥。
+  安装时填写社区所有者的 Nostr 公钥，以及一套独立的稳定中继私钥。所有者的个人私钥不能填入安装向导。
+  Git Hook HMAC 密钥由应用自动生成并稳定保存；请妥善备份中继私钥。
   启动器入口提供邀请页面和 Git 仓库浏览器，桌面或移动端 Buzz 客户端可通过当前应用域名连接此中继。
