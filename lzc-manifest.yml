@@ -19,7 +19,7 @@ services:
   relay:
     # upstream: ghcr.io/block/buzz:main@sha256:481ae6ac54c85f03291eac2de1ff9d45978295a9c61810b26e90e88dfbc095ae
     image: registry.lazycat.cloud/czyt/block/buzz:bcf555cc157768ee
-    run_as: 1000
+    user: "0"
     environment:
       - BUZZ_BIND_ADDR=0.0.0.0:3000
       - BUZZ_HEALTH_PORT=8080
