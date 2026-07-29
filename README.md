@@ -67,12 +67,12 @@ lzc-cli lpk info dist/buzz.lpk
 
 `.github/workflows/lazycat.yml` checks `ghcr.io/block/buzz:main` every day. When the Linux amd64 digest changes, it:
 
-1. Copies only the Buzz relay image to the LazyCat Registry.
+1. Updates only the Buzz relay image to the digest-pinned `ghcr.1ms.run/block/buzz:main` mirror after verifying that its Linux amd64 digest matches the source image.
 2. Increments the package patch version from the current `0.4.x` value.
 3. Builds and verifies the LPK.
 4. Creates a `v<version>` tag and GitHub Release with `community.lazycat.app.buzz-v<version>.lpk`.
-5. Submits the verified package to the official LazyCat store.
+5. Submits the verified package only to the MiaoMiao private store.
 
 The PostgreSQL, Redis, MinIO, and MinIO Client images are fixed to their initially copied LazyCat Registry references and are not managed by the update workflow.
 
-Configure the GitHub Actions secret `LAZYCAT_TOKEN` for this repository (or authorize the repository to use the organization-level secret) before running the workflow.
+Configure the GitHub Actions secrets `APPSTORE_URL` and `APPSTORE_TOKEN` for this repository, or authorize it to use the organization-level secrets, before running the workflow. `APP_ID` and `PRIVATE_STORE_GROUP_CODES` remain optional.

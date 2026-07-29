@@ -28,26 +28,16 @@ images:
     sort: created
     tag_regex: '^main$'
     delivery:
-      mode: lazycat
+      mode: mirror
+      image_template: ghcr.1ms.run/block/buzz:{tag}
+      require_digest_match: true
 
 stores:
   official:
-    enabled: true
-    skip_if_version_exists: true
-    create_if_missing: true
-    changelog_locales:
-      - zh
-      - en
+    enabled: false
+    skip_if_version_exists: false
     retry:
       enabled: false
-      max_attempts: 3
-      initial_delay: 2s
-      max_delay: 30s
-    application:
-      language: zh
-      name: Buzz
-      source: https://github.com/block/buzz
-      source_author: block
   private:
     enabled: true
     skip_if_version_exists: true
