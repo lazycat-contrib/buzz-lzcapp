@@ -14,11 +14,10 @@ application:
         - "/*"
       do:
         - src: file:///lzcapp/pkg/content/lazycat-injects/lzc-file-chooser-inject.js
-
 services:
   relay:
-    # upstream: ghcr.io/block/buzz:main@sha256:481ae6ac54c85f03291eac2de1ff9d45978295a9c61810b26e90e88dfbc095ae
-    image: registry.lazycat.cloud/czyt/block/buzz:bcf555cc157768ee
+    # upstream: ghcr.io/block/buzz:main@sha256:8803a8998ee57e3b9da25bf335a2ac53e154f4e58cbc946d2ed64a0ca7dbb6b7
+    image: registry.lazycat.cloud/czyt/block/buzz:ba7d30fd44a52fdf
     user: "0"
     environment:
       - BUZZ_BIND_ADDR=0.0.0.0:3000
@@ -62,7 +61,6 @@ services:
       retries: 12
       start_period: 30s
     mem_limit: 2G
-
   postgres:
     # upstream: postgres:17-alpine
     image: registry.lazycat.cloud/czyt/library/postgres:ed54717bb8980026
@@ -82,7 +80,6 @@ services:
       retries: 12
       start_period: 10s
     mem_limit: 1G
-
   redis:
     # upstream: redis:7-alpine
     image: registry.lazycat.cloud/czyt/library/redis:3c920c7722097bfa
@@ -99,7 +96,6 @@ services:
       retries: 12
       start_period: 5s
     mem_limit: 512M
-
   minio:
     # upstream: minio/minio:RELEASE.2025-09-07T16-13-09Z
     image: registry.lazycat.cloud/czyt/minio/minio:9bb231199b35a5fa
@@ -120,7 +116,6 @@ services:
       retries: 12
       start_period: 10s
     mem_limit: 1G
-
   minio-init:
     # upstream: minio/mc:RELEASE.2025-08-13T08-35-41Z
     image: registry.lazycat.cloud/czyt/minio/mc:f3ee9765dbdcd95d
@@ -143,7 +138,6 @@ services:
       retries: 60
       start_period: 5s
     mem_limit: 256M
-
 usage: |
   首次部署需要准备两套独立的 Nostr 密钥对，但安装向导只填写两个值：
   1. Owner 身份密钥对：将 64 位十六进制公钥填入“中继所有者公钥”；对应私钥只保存在所有者的 Nostr 客户端或密码管理器中，绝不能填入本应用。已有 Nostr 身份可以直接复用。这里要的是原始 hex，不是 Base64，也不是 npub1... 编码。
